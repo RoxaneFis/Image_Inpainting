@@ -62,18 +62,21 @@ def random_search(B,A,FNN,taille,scale):
     heightB,weightB = B.shape[:2]
     for x in range(taille+scale+1,weightA-scale-taille-2):
         for y in range(taille+scale+1,heightA-scale-taille-2):
+            xB = FNN[y,x][1]
+            yB = FNN[y,x][0]
             min_dist=float("inf")
             PA = Patch(taille,A,y,x)
             ind_i=-scale
             ind_j=-scale
             for i in range(-scale,scale+1):
                 for j in range(-scale,scale+1):
-                    PB = Patch(taille,B,y+j,x+i)
-                    d = PA.distance(PB)
-                    if(d<min_dist):
-                        min_dist=d
-                        ind_i=i
-                        ind_j=j
-            FNN[y,x]=FNN[y+ind_j,x+ind_i]
-            A[y,x]=B[y+ind_j,x+ind_i]
+                    PB = Patch(taille,B,yB+j,xB+i)
+                    if PB.mat.shape==PA.mat.shape:
+                        d = PA.distance(PB)
+                        if(d<min_dist):
+                            min_dist=d
+                            ind_i=i
+                            ind_j=j
+            FNN[y,x]=[yB+ind_j,xB+ind_i]
+            A[y,x]=B[yB+ind_j,xB+ind_i]
     return FNN,A
