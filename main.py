@@ -20,19 +20,32 @@ if __name__ == '__main__':
     nombre_etape=3
     args = parse_args()
     B =cv2.imread(args.image_input)
-    He=B
+    heightB,weightB = B.shape[:2]
     cv2.imshow("image_B",B)
-    A = B
-    FNN, A = initialisation(He,B,A,taille)
-    cv2.imshow("image_A_ini",A)
-    for etape in range(nombre_etape):
-        print("Debut etape"+str(etape))
-        print("Phase de propagation")
-        FNN,A = propagation(B,A,FNN,etape,taille)
-        cv2.imshow('image_A_propag '+str(etape),A)
-        print("Phase de random search")
-        FNN,A = random_search(B,A,FNN,taille,scale)
-        cv2.imshow('image_A_random_search '+str(etape),A)
+
+    x_min=int(weightB/2)
+    x_max=x_min + 30
+    y_min=int(heightB/2)
+    y_max=y_min + 30
+
+    holes_coord = {"x_min":x_min,"x_max":x_max,"y_min":y_min,"y_max":y_max}
+    He = np.zeros((heightB,weightB),dtype='i')
+    He[x_min:x_max,y_min:y_max]=1
+
+    FNN, A_padding = initialisation(He,B,taille,holes_coord)
+    cv2.imshow("image_A_padding_ini",A_padding)
+    C = B
+    C[y_min-taille:y_max+taille+1,x_min-taille:x_max+taille+1]=A_padding
+    cv2.imshow("image_C_ini",C)
+
+    # for etape in range(nombre_etape):
+    #     print("Debut etape"+str(etape))
+    #     print("Phase de propagation")
+    #     FNN,A_padding = propagation(B,A_padding,FNN,etape,taille)
+    #     cv2.imshow('image_A_propag '+str(etape),A_padding)
+    #     print("Phase de random search")
+    #     FNN,A_padding = random_search(B,A_padding,FNN,taille,scale)
+    #     cv2.imshow('image_A_random_search '+str(etape),A_padding)
     cv2.waitKey()
 
 
