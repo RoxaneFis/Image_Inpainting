@@ -3,26 +3,51 @@ import numpy as np
 import cv2
 from Patch import Patch
 
-def initialisation(He, B, A,taille):
+def check_boundary(x:int, y:int,height:int,width:int)->bool:
+    return(x>=0 and x<height and y>=0 and y<width)
+
+def not_hole(He, x:int, y:int)->bool:
+    height,width = He.shape[:2]
+    if(He[y,x]==1 or not check_boundary(x,y,height,width)):
+        return False
+    else:
+        return True
+
+        
+
+def initialisation(He, B, taille: int, holes_coord):
     #B image trouee
     #A image à randomiser
-    heightA,weightA = A.shape[:2]
-    heightB,weightB = B.shape[:2]
-    FNN = np.zeros((heightB,weightB,2),dtype='i')
-    for x in range(weightA):
-        for y in range(heightA):
-            xB = random.randint(taille,weightB-1-taille)
+    x_min = holes_coord["x_min"]
+    x_max = holes_coord["x_max"]
+    y_min = holes_coord["y_min"]
+    y_max = holes_coord["y_max"]
+    heightA = x_max- x_min+ 1
+    widthA = y_max-y_min+1
+    heightB,widthB = B.shape[:2]
+    FNN = np.zeros((heightA,widthA,2),dtype='i')
+    #Initialise A_padding = holes + boundaries
+    A_padding = np.zeros((heightA+2*taille,widthA+2*taille))
+    A_padding = B[y_min-taille:y_max+taille+1,x_min-taille:x_max+taille+1]
+    for x in range(taille, widthA+taille):
+        for y in range(taille, heightA+taille):
+            xB = random.randint(taille,widthB-1-taille)
             yB = random.randint(taille,heightB-1-taille)
-            FNN[y][x][0]=yB
-            FNN[y][x][1]=xB
-            A[y,x]=B[yB,xB]
-    return FNN,A
+            while (not not_hole(He,xB,yB)):
+                xB = random.randint(taille,widthB-1-taille)
+                yB = random.randint(taille,heightB-1-taille)
+            #Initialise Fnn with random patch values
+            FNN[y-taille][x-taille][0]=yB
+            FNN[y-taille][x-taille][1]=xB
+            #Initialise A with random values
+            A_padding[y,x]=B[yB,xB]
+    return FNN,A_padding
 
 def propagation(B,A,FNN,etape,taille):
-    heightA,weightA = A.shape[:2]
-    heightB,weightB = B.shape[:2]
+    heightA,widthA = A.shape[:2]
+    heightB,widthB = B.shape[:2]
     if (etape%2==0): #pair
-        for x in range(taille+1,weightA-taille-1):
+        for x in range(taille+1,widthA-taille-1):
             for y in range(taille+1,heightA-taille-1):
                     PA = Patch(taille,A,y,x)
                     voisins=[[y,x],[y-1,x],[y,x-1]]
@@ -30,7 +55,7 @@ def propagation(B,A,FNN,etape,taille):
                     voisins_B = [FNN[y,x],FNN[y-1,x]+[1,0],FNN[y,x-1]+[0,1]]
                     if(voisins_B[1][0]>heightB-taille-1):
                         voisins_B[1]=FNN[y-1,x]
-                    if(voisins_B[2][1]>weightB-taille-1):
+                    if(voisins_B[2][1]>widthB-taille-1):
                         voisins_B[2]=FNN[y,x-1]
                     distances=[]
                     for i in range(3):
@@ -44,7 +69,7 @@ def propagation(B,A,FNN,etape,taille):
 
     if (etape%2==1): #impair
         for y in range(heightA-taille-2,taille):
-            for x in range(weightA-taille-2,taille):
+            for x in range(widthA-taille-2,taille):
                     PA = Patch(taille,A,y,x)
                     voisins=[[y,x],[y+1,x],[y,x+1]]
                     voisins_B = [FNN[y,x],FNN[y+1,x],FNN[y,x+1]]
@@ -61,14 +86,10 @@ def propagation(B,A,FNN,etape,taille):
 
 def random_search(B,A,FNN,taille,scale):
     #Phase à modifier : modification taille de la fenetre à diminuer au sein d'une même étape + RANDOM
-    heightA,weightA = A.shape[:2]
-    heightB,weightB = B.shape[:2]
+    heightA,widthA = A.shape[:2]
+    heightB,widthB = B.shape[:2]
 
-    while scale >=1:
-        rx = random.randint(-scale,scale)
-        ry = random.randint(-scale,scale)
-
-    for x in range(taille+scale+1,weightA-scale-taille-2):
+    for x in range(taille+scale+1,widthA-scale-taille-2):
         for y in range(taille+scale+1,heightA-scale-taille-2):
             PA = Patch(taille,A,y,x)
             scale_reduce = scale
