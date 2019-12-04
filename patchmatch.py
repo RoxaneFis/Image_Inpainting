@@ -63,11 +63,6 @@ def random_search(B,A,FNN,taille,scale):
     #Phase à modifier : modification taille de la fenetre à diminuer au sein d'une même étape + RANDOM
     heightA,weightA = A.shape[:2]
     heightB,weightB = B.shape[:2]
-
-    while scale >=1:
-        rx = random.randint(-scale,scale)
-        ry = random.randint(-scale,scale)
-
     for x in range(taille+scale+1,weightA-scale-taille-2):
         for y in range(taille+scale+1,heightA-scale-taille-2):
             PA = Patch(taille,A,y,x)
@@ -78,7 +73,7 @@ def random_search(B,A,FNN,taille,scale):
                 rx = random.randint(-scale,scale)
                 ry = random.randint(-scale,scale)
                 #TO Do : vérifier que rx et ry ne sont pas dans le trou ou en dehors du bord
-                
+
                 PB = Patch(taille,B,yB,xB)
                 P_Potentiel = Patch(taille,B,yB+ry,xB+rx)
                 if PA.distance(P_Potentiel)<PA.distance(PB):
