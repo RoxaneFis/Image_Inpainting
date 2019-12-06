@@ -2,6 +2,7 @@ import random
 import numpy as np
 import cv2
 from Patch import Patch
+from utils import gradient
 
 def check_boundary(taille:int,y:int, x:int,height:int,width:int)->bool:
     return(x>=taille and x<height-taille and y>=taille and y<width-taille)
