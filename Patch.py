@@ -11,5 +11,5 @@ class Patch:
         d_color = cv2.norm(self.mat,P2.mat)
         d_gradient =  cv2.norm(self.grad,P2.grad)
         d = alpha[0]*d_color+alpha[1]*d_gradient
-        return d_color
+        return d
         
