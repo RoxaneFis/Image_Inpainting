@@ -5,11 +5,11 @@ from Patch import Patch
 from utils import gradient
 
 def check_boundary(taille:int,y:int, x:int,height:int,width:int)->bool:
-    return(x>=taille and x<height-taille and y>=taille and y<width-taille)
+    return(y>=taille and y<height-taille and x>=taille and x<width-taille)
 
 def not_hole(taille:int,He, y:int, x:int)->bool:
     height,width = He.shape[:2]
-    if(not check_boundary(taille,x,y,height,width)or He[y,x]==1 ):
+    if(not check_boundary(taille,y,x,height,width)or He[y,x]==1 ):
         return False
     else:
         return True
@@ -56,6 +56,7 @@ def propagation(B,A_padding,He,FNN,etape,taille):
     heightB,widthB = B.shape[:2]
     if (etape%2==0): #pair
         for x in range(taille, widthA+taille):
+            print(x)
             for y in range(taille, heightA+taille):
                     PA = Patch(taille,A_padding,y,x)
                     voisins=[[y,x],[y-1,x],[y,x-1]]
@@ -73,8 +74,9 @@ def propagation(B,A_padding,He,FNN,etape,taille):
                     A_padding[y,x]=B[yB,xB]
 
     if (etape%2==1): #impair
-        for y in range(heightA+taille,taille):
-            for x in range(widthA+taille,taille):
+        for x in range(widthA+taille-1,taille-1,-1):
+            print(x)
+            for y in range(heightA+taille-1,taille-1,-1):
                     PA = Patch(taille,A_padding,y,x)
                     voisins=[[y,x],[y+1,x],[y,x+1]]
                     voisins_B = [FNN[y,x],FNN[y+1,x],FNN[y,x+1]]
