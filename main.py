@@ -10,6 +10,7 @@ def parse_args():
     """Parse input arguments."""
     parser = argparse.ArgumentParser(description='Multiple object tracker')
     parser.add_argument('--image_input', type=str, help='file to full image to fill')
+    parser.add_argument('--nombre_etapes', type=int, help='nombre d etapes')
     #parser.add_argument('--image_hole', type=str, help='file to hole in full image to fill')
     args = parser.parse_args()
     return args
@@ -17,17 +18,19 @@ def parse_args():
 if __name__ == '__main__':
     print("Debut")
     
-    #HYPERPARAMETERS
-    taille=20
-    scale=200
-    nombre_etape=10
+
 
     #INITIAL IMAGE
     args = parse_args()
     B =cv2.imread(args.image_input)
     heightB,weightB = B.shape[:2]
     cv2.imshow("image_B",B)
-
+    grad = gradient(B)
+    cv2.imshow("gradient",grad)
+    #HYPERPARAMETERS
+    taille=20
+    scale=200
+    nombre_etape=args.nombre_etapes
 
     #INITIALIZE HOLE
     x_min=int(weightB/2) 
@@ -47,20 +50,18 @@ if __name__ == '__main__':
 
 
     for etape in range(nombre_etape):
-        print(etape)
+        print(f"Phase de propagation: {etape}")
         FNN,A_padding = propagation(B,A_padding,He,FNN,etape,taille)
         C[y_min-taille:y_max+taille+1,x_min-taille:x_max+taille+1]=A_padding
         if (etape%3==0): 
-            print(f"Phase de propagation: {etape}")
+            
             cv2.imshow(f"A_padding_propagation_{etape}",A_padding)
             cv2.imshow(f"C_propagation_{etape}",C)
         
-        FNN,A_padding = random_search(B,A_padding, He,FNN,taille,scale)
-        FNN,A_padding = random_search(B,A_padding, He,FNN,taille,scale)
+        print(f"Random search {etape}")
         FNN,A_padding = random_search(B,A_padding, He,FNN,taille,scale)
         C[y_min-taille:y_max+taille+1,x_min-taille:x_max+taille+1]=A_padding
         if (etape%3==0): 
-            print(f"Random search {etape}")
             cv2.imshow(f"A_padding_random_{etape}",A_padding)
             cv2.imshow(f"C_random_{etape}",C)
     cv2.waitKey()
