@@ -97,6 +97,7 @@ def random_search(B,A_padding,He,FNN,taille,scale):
     heightA_padding,widthA_padding = A_padding.shape[:2]
     heightA,widthA = heightA_padding-2*taille,widthA_padding-2*taille
     heightB,widthB = B.shape[:2]
+    i=0
     for x in range(taille, widthA+taille):
         for y in range(taille, heightA+taille):
             PA = Patch(taille,A_padding,y,x)
@@ -118,10 +119,13 @@ def random_search(B,A_padding,He,FNN,taille,scale):
                 # print(P_Potentiel.mat)
                 # print(f"yb {yB}, xB {xB} ,yB+ry {yB+ry},xB+rx {xB+rx}")
                 # print()
+                
                 if PA.distance(P_Potentiel)<PA.distance(PB):
+                    print("AMELIORATION PAR RANDOM SEARCH pixel "+str(x) + ' '+str(y))
                     FNN[y][x][0]=yB+ry
                     FNN[y][x][1]=xB+rx
                     A_padding[y,x]=B[yB+ry,xB+rx]
+                    i+=1
 
-                scale_reduce=scale_reduce//2
+                scale_reduce=(3*scale_reduce)//4
     return FNN,A_padding
