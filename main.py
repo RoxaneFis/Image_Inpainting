@@ -3,7 +3,7 @@ import argparse
 import numpy as np
 import jupyterlab
 from patchmatch import initialisation, propagation, random_search
-from utils import gradient
+from utils import gradient, visualisation, verification
 
 
 def parse_args():
@@ -23,23 +23,24 @@ if __name__ == '__main__':
     #INITIAL IMAGE
     args = parse_args()
     B =cv2.imread(args.image_input)
-    heightB,weightB = B.shape[:2]
+    heightB,widthB = B.shape[:2]
     cv2.imshow("image_B",B)
     grad = gradient(B)
     cv2.imshow("gradient",grad)
+
     #HYPERPARAMETERS
-    taille=20
-    scale=200
+    taille=40
+    scale=800
     nombre_etape=args.nombre_etapes
 
     #INITIALIZE HOLE
-    x_min=int(weightB/2) 
-    x_max=x_min + 80
+    x_min=int(widthB/2) 
+    x_max=x_min + 70
     y_min=int(heightB/2)
-    y_max=y_min + 80
+    y_max=y_min + 70
     holes_coord = {"x_min":x_min,"x_max":x_max,"y_min":y_min,"y_max":y_max}
     He = np.zeros((heightB,weightB),dtype='i')
-    He[x_min:x_max,y_min:y_max]=1
+    He[y_min:y_max+1,x_min:x_max+1]=1
 
     #INITIALISATION
     FNN, A_padding = initialisation(He,B,taille,holes_coord)
@@ -48,15 +49,21 @@ if __name__ == '__main__':
     C[y_min-taille:y_max+taille+1,x_min-taille:x_max+taille+1]=A_padding
     cv2.imshow("image_C_in",C)
 
+    visu=visualisation(A_padding,C,FNN,taille,holes_coord)
+    cv2.imshow(f"Visu_propagation_ini",visu)
+    cv2.imshow("image_C_deux",C)
 
     for etape in range(nombre_etape):
         print(f"Phase de propagation: {etape}")
         FNN,A_padding = propagation(B,A_padding,He,FNN,etape,taille)
         C[y_min-taille:y_max+taille+1,x_min-taille:x_max+taille+1]=A_padding
+        
         if (etape%3==0): 
             
             cv2.imshow(f"A_padding_propagation_{etape}",A_padding)
             cv2.imshow(f"C_propagation_{etape}",C)
+            visu=visualisation(A_padding,C,FNN,taille,holes_coord)
+            cv2.imshow(f"Visu_propagation_{etape}",visu)
         
         print(f"Random search {etape}")
         FNN,A_padding = random_search(B,A_padding, He,FNN,taille,scale)
@@ -64,6 +71,9 @@ if __name__ == '__main__':
         if (etape%3==0): 
             cv2.imshow(f"A_padding_random_{etape}",A_padding)
             cv2.imshow(f"C_random_{etape}",C)
+            visu=visualisation(A_padding,C,FNN,taille,holes_coord)
+            cv2.imshow(f"Visu_random_{etape}",visu)
+        verification(A_padding,C,FNN,taille,holes_coord)
     cv2.waitKey()
 
 
