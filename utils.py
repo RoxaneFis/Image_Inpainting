@@ -11,8 +11,5 @@ def gradient(img):
     sobelx = np.uint8(np.absolute(sobelx64))
     sobely = np.uint8(np.absolute(sobely64))
     height,width= img.shape[:2]
-    grad=sobelx
-    for x in range(width):
-        for y in range(height):
-            grad[y][x]=np.sqrt(sobelx[y][x]**2+sobely[y][x]**2)
+    grad=0.5*(sobelx+sobely)
     return grad
