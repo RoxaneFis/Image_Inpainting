@@ -30,7 +30,7 @@ if __name__ == '__main__':
 
     #HYPERPARAMETERS
     taille=40
-    scale=800
+    scale=100
     nombre_etape=args.nombre_etapes
 
     #INITIALIZE HOLE
@@ -40,7 +40,7 @@ if __name__ == '__main__':
     y_max=y_min + 80
     holes_coord = {"x_min":x_min,"x_max":x_max,"y_min":y_min,"y_max":y_max}
     He = np.zeros((heightB,widthB),dtype='i')
-    He[y_min:y_max+1,x_min:x_max+1]=1
+    He[y_min:y_max,x_min:x_max]=1
 
     #INITIALISATION
     FNN, A = initialisation(He,B,taille,holes_coord)
@@ -55,16 +55,18 @@ if __name__ == '__main__':
         
         if (etape%3==0): 
             cv2.imshow(f"A_propagation_{etape}",A)
-            #visu=visualisation(A_padding,C,FNN,taille,holes_coord)
+            #visu=visualisation(A,FNN,taille,holes_coord,He)
             #cv2.imshow(f"Visu_propagation_{etape}",visu)
         
         print(f"Random search {etape}")
         FNN,A = random_search(A, He,FNN,taille,scale,holes_coord)
         if (etape%3==0): 
             cv2.imshow(f"A_random_{etape}",A)
-            #visu=visualisation(A_padding,C,FNN,taille,holes_coord)
+            #visu=visualisation(A,FNN,taille,holes_coord,He)
             #cv2.imshow(f"Visu_random_{etape}",visu)
-        #verification(A_padding,C,FNN,taille,holes_coord)
+        print("Verification")
+        #verification(A,FNN,taille,holes_coord,He)
+    print("FIN")
     cv2.waitKey()
 
 
