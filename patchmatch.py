@@ -56,7 +56,6 @@ def propagation(B,A_padding,He,FNN,etape,taille):
     heightB,widthB = B.shape[:2]
     if (etape%2==0): #pair
         for x in range(taille, widthA+taille):
-            print(x)
             for y in range(taille, heightA+taille):
                     PA = Patch(taille,A_padding,y,x)
                     voisins=[[y,x],[y-1,x],[y,x-1]]
@@ -75,7 +74,6 @@ def propagation(B,A_padding,He,FNN,etape,taille):
 
     if (etape%2==1): #impair
         for x in range(widthA+taille-1,taille-1,-1):
-            print(x)
             for y in range(heightA+taille-1,taille-1,-1):
                     PA = Patch(taille,A_padding,y,x)
                     voisins=[[y,x],[y+1,x],[y,x+1]]
@@ -93,7 +91,6 @@ def propagation(B,A_padding,He,FNN,etape,taille):
     return FNN,A_padding
 
 def random_search(B,A_padding,He,FNN,taille,scale):
-    #Phase à modifier : modification taille de la fenetre à diminuer au sein d'une même étape + RANDOM
     heightA_padding,widthA_padding = A_padding.shape[:2]
     heightA,widthA = heightA_padding-2*taille,widthA_padding-2*taille
     heightB,widthB = B.shape[:2]
@@ -107,21 +104,12 @@ def random_search(B,A_padding,He,FNN,taille,scale):
                 yB = FNN[y,x][0]
                 rx = random.randint(-scale,scale)
                 ry = random.randint(-scale,scale)
-                #TO Do : vérifier que rx et ry ne sont pas dans le trou ou en dehors du bord
                 while (not not_hole(taille,He,yB+ry,xB+rx)):
                     rx = random.randint(-scale,scale)
                     ry = random.randint(-scale,scale)
                 PB = Patch(taille,B,yB,xB)
                 P_Potentiel = Patch(taille,B,yB+ry,xB+rx)
-                # print("PB_______")
-                # print(PB.mat)
-                # print("P_Potentiel_______")
-                # print(P_Potentiel.mat)
-                # print(f"yb {yB}, xB {xB} ,yB+ry {yB+ry},xB+rx {xB+rx}")
-                # print()
-                
                 if PA.distance(P_Potentiel)<PA.distance(PB):
-                    print("AMELIORATION PAR RANDOM SEARCH pixel "+str(x) + ' '+str(y))
                     FNN[y][x][0]=yB+ry
                     FNN[y][x][1]=xB+rx
                     A_padding[y,x]=B[yB+ry,xB+rx]

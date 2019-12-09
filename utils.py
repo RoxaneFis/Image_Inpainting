@@ -25,7 +25,7 @@ def visualisation(A_padding,C,FNN,taille,holes_coord):
             for y in range(taille, heightA+taille):
                 if(y%10==0):
                     x_ = holes_coord['x_min']+x-taille
-                    y_ = holes_coord['y_min']+x-taille
+                    y_ = holes_coord['y_min']+y-taille
                     start_point=(x_,y_)
                     end_point=(FNN[y][x][1],FNN[y][x][0])
                     R=random.randint(0,255)
