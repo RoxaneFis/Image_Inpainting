@@ -35,45 +35,36 @@ if __name__ == '__main__':
 
     #INITIALIZE HOLE
     x_min=int(widthB/2) 
-    x_max=x_min + 70
+    x_max=x_min + 80
     y_min=int(heightB/2)
-    y_max=y_min + 70
+    y_max=y_min + 80
     holes_coord = {"x_min":x_min,"x_max":x_max,"y_min":y_min,"y_max":y_max}
-    He = np.zeros((heightB,weightB),dtype='i')
+    He = np.zeros((heightB,widthB),dtype='i')
     He[y_min:y_max+1,x_min:x_max+1]=1
 
     #INITIALISATION
-    FNN, A_padding = initialisation(He,B,taille,holes_coord)
-    cv2.imshow("image_A_padding_ini",A_padding)
-    C = B
-    C[y_min-taille:y_max+taille+1,x_min-taille:x_max+taille+1]=A_padding
-    cv2.imshow("image_C_in",C)
+    FNN, A = initialisation(He,B,taille,holes_coord)
+    cv2.imshow("image_A_ini",A)
 
-    visu=visualisation(A_padding,C,FNN,taille,holes_coord)
-    cv2.imshow(f"Visu_propagation_ini",visu)
-    cv2.imshow("image_C_deux",C)
+    #visu=visualisation(A_padding,C,FNN,taille,holes_coord)
+    #cv2.imshow(f"Visu_propagation_ini",visu)
 
     for etape in range(nombre_etape):
         print(f"Phase de propagation: {etape}")
-        FNN,A_padding = propagation(B,A_padding,He,FNN,etape,taille)
-        C[y_min-taille:y_max+taille+1,x_min-taille:x_max+taille+1]=A_padding
+        FNN,A = propagation(A,He,FNN,etape,taille,holes_coord)
         
         if (etape%3==0): 
-            
-            cv2.imshow(f"A_padding_propagation_{etape}",A_padding)
-            cv2.imshow(f"C_propagation_{etape}",C)
-            visu=visualisation(A_padding,C,FNN,taille,holes_coord)
-            cv2.imshow(f"Visu_propagation_{etape}",visu)
+            cv2.imshow(f"A_propagation_{etape}",A)
+            #visu=visualisation(A_padding,C,FNN,taille,holes_coord)
+            #cv2.imshow(f"Visu_propagation_{etape}",visu)
         
         print(f"Random search {etape}")
-        FNN,A_padding = random_search(B,A_padding, He,FNN,taille,scale)
-        C[y_min-taille:y_max+taille+1,x_min-taille:x_max+taille+1]=A_padding
+        FNN,A = random_search(A, He,FNN,taille,scale,holes_coord)
         if (etape%3==0): 
-            cv2.imshow(f"A_padding_random_{etape}",A_padding)
-            cv2.imshow(f"C_random_{etape}",C)
-            visu=visualisation(A_padding,C,FNN,taille,holes_coord)
-            cv2.imshow(f"Visu_random_{etape}",visu)
-        verification(A_padding,C,FNN,taille,holes_coord)
+            cv2.imshow(f"A_random_{etape}",A)
+            #visu=visualisation(A_padding,C,FNN,taille,holes_coord)
+            #cv2.imshow(f"Visu_random_{etape}",visu)
+        #verification(A_padding,C,FNN,taille,holes_coord)
     cv2.waitKey()
 
 
