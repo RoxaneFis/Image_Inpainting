@@ -15,18 +15,17 @@ def gradient(img):
     grad=(sobelx+sobely)//2
     return grad
 
-def visualisation(A_padding,C,FNN,taille,holes_coord):
-    img=C.copy()
-    heightA_padding,widthA_padding = A_padding.shape[:2]
-    heightA,widthA = heightA_padding-2*taille,widthA_padding-2*taille
-
-    for x in range(taille, widthA+taille):
-        if(x%10==0):
-            for y in range(taille, heightA+taille):
-                if(y%10==0):
-                    x_ = holes_coord['x_min']+x-taille
-                    y_ = holes_coord['y_min']+y-taille
-                    start_point=(x_,y_)
+def visualisation(A,FNN,taille,holes_coord,He):
+    img=A.copy()
+    heightA,widthA = A.shape[:2]
+    x_min = holes_coord["x_min"]
+    x_max = holes_coord["x_max"]
+    y_min = holes_coord["y_min"]
+    y_max = holes_coord["y_max"]
+    for x in range(x_min, x_max):
+            for y in range(y_min, y_max):
+                if He[y,x]==1:
+                    start_point=(x,y)
                     end_point=(FNN[y][x][1],FNN[y][x][0])
                     R=random.randint(0,255)
                     G=random.randint(0,255)
@@ -34,17 +33,19 @@ def visualisation(A_padding,C,FNN,taille,holes_coord):
                     cv2.line(img,start_point,end_point,(B,G,R),1)
     return img
 
-def verification(A_padding,C,FNN,taille,holes_coord):
-    img=C.copy()
-    heightA_padding,widthA_padding = A_padding.shape[:2]
-    heightA,widthA = heightA_padding-2*taille,widthA_padding-2*taille
+def verification(A,FNN,taille,holes_coord,He):
+    x_min = holes_coord["x_min"]
+    x_max = holes_coord["x_max"]
+    y_min = holes_coord["y_min"]
+    y_max = holes_coord["y_max"]
     print("coord du trou ")
     print(holes_coord)
-    for x in range(taille, widthA+taille):
-            for y in range(taille, heightA+taille):
+    for x in range(x_min,x_max):
+            for y in range(y_min,y_max):
+                if He[y,x]==1:
                     xB=FNN[y][x][1]
                     yB=FNN[y][x][0]
-                    if(holes_coord['x_min']<=xB<=holes_coord['x_max'] and holes_coord['y_min']<=yB<=holes_coord['y_max']):
+                    if(holes_coord['x_min']<=xB<holes_coord['x_max'] and holes_coord['y_min']<=yB<holes_coord['y_max']):
                         print(f"ERREUR : {y},{x} matche avec {FNN[y][x]}")
     print("coord du trou ")
     print(holes_coord)
