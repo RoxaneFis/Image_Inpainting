@@ -61,12 +61,18 @@ def propagation(A,He,FNN,etape,taille,holes_coord):
                     voisins=[[y,x],[y-1,x],[y,x-1]]
                     #TO DO : essayer avec les voisins de FNN[y-1,x] et FNN[y,x-1] (attention aux bords)
                     voisins_FNN = [FNN[y,x],FNN[y-1,x],FNN[y-1,x]+[1,0],FNN[y,x-1],FNN[y,x-1]+[0,1]]
+                    #voisins_FNN = [FNN[y,x],FNN[y-1,x],FNN[y,x-1]]
                     voisins_FNN = [indices for indices in voisins_FNN if not_hole(taille,He, indices[0], indices[1]) ]
                     distances=[]
                     for voisin in voisins_FNN:
                         PB = Patch(taille,A,voisin[0],voisin[1])
                         distances.append(PA.distance(PB))
                     ind_min = np.argmin(distances)
+                    #print(f"indice_min : {ind_min}")
+                    #if(voisins_FNN[ind_min][0]==(FNN[y-1,x]+[1,0])[0] and voisins_FNN[ind_min][1]==(FNN[y-1,x]+[1,0])[1]):
+                    #    print(f"Amelioration du voisin du patch du voisin pour le pixel : x={x},y={y}")
+                    #if(voisins_FNN[ind_min][0]==(FNN[y,x-1]+[0,1])[0] and voisins_FNN[ind_min][1]==(FNN[y,x-1]+[0,1])[1]):
+                    #    print(f"Amelioration du voisin du patch du voisin pour le pixel : x={x},y={y}")
                     FNN[y,x]=voisins_FNN[ind_min]
                     yB = FNN[y][x][0]
                     xB = FNN[y][x][1]
@@ -79,6 +85,7 @@ def propagation(A,He,FNN,etape,taille,holes_coord):
                     PA = Patch(taille,A,y,x)
                     voisins=[[y,x],[y+1,x],[y,x+1]]
                     voisins_FNN = [FNN[y,x],FNN[y+1,x],FNN[y+1,x]+[-1,0],FNN[y,x+1],FNN[y,x+1]+[0,-1]]
+                    #voisins_FNN = [FNN[y,x],FNN[y+1,x],FNN[y,x+1]]
                     voisins_FNN = [indices for indices in voisins_FNN if not_hole(taille,He, indices[0], indices[1]) ]                    
                     distances=[]
                     for voisin in voisins_FNN:
