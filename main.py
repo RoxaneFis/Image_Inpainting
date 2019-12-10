@@ -12,7 +12,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Multiple object tracker')
     parser.add_argument('--image_input', type=str, help='file to full image to fill')
     parser.add_argument('--nombre_etapes', type=int, help='nombre d etapes', default=3)
-    parser.add_argument('--taille', type=int, help='taille du patch',default=20)
+    parser.add_argument('--taille', type=int, help='taille du patch',default=21)
     parser.add_argument('--scale', type=int, help='Echelle random search', default=100)
     parser.add_argument('--sizebrush', type=int, help='Taille de la brosse', default=15)
     #parser.add_argument('--image_hole', type=str, help='file to hole in full image to fill')
@@ -48,7 +48,7 @@ if __name__ == '__main__':
         for y in range(param.height-1):
             if He[y,x]==1:
                 B[y,x]=(0,0,0)
-    cv2.imshow("B",B)
+    cv2.imshow("B_painted",B)
 
     #INITIALISATION
     FNN, A = initialisation(He,B,taille,holes_coord)
@@ -56,19 +56,21 @@ if __name__ == '__main__':
 
     #visu=visualisation(A_padding,C,FNN,taille,holes_coord)
     #cv2.imshow(f"Visu_propagation_ini",visu)
-
+    #tailles=[20,20,10, 10,5,5]
     for etape in range(nombre_etape):
-        print(f"Phase de propagation: {etape}")
+        taille = taille-1
+        # taille = tailles[etape%6]
+        print(f"Phase de propagation: {etape} taille: {taille}")
         FNN,A = propagation(A,He,FNN,etape,taille,holes_coord)
         if (etape%1==0): 
-            cv2.imshow(f"A_propagation_{etape}",A)
+            cv2.imshow(f"A_propagation_{etape} taille: {taille}",A)
             #visu=visualisation(A, FNN,taille,holes_coord, He)
             #cv2.imshow(f"Visu_propagation_{etape}",visu)
         
-        print(f"Random search {etape}")
+        print(f"Random search {etape} taille: {taille}")
         FNN,A = random_search(A, He,FNN,taille,scale,holes_coord)
         if (etape%1==0): 
-            cv2.imshow(f"A_random_{etape}",A)
+            cv2.imshow(f"A_random_{etape} taille: {taille}",A)
             #visu=visualisation(A,FNN,taille,holes_coord, He)
             #cv2.imshow(f"Visu_random_{etape}",visu)
         #verification(A,FNN,taille,holes_coord, He)
