@@ -50,3 +50,6 @@ def verification(A,FNN,taille,holes_coord,He):
     print("coord du trou ")
     print(holes_coord)
     print("PAS D'ERREUR")
+
+def evaluation(img_origine,img_completee):
+    return cv2.norm(img_origine,img_completee)
