@@ -47,7 +47,7 @@ def initialisation(He, B, taille: int, holes_coord):
                 A[y,x]=B[yB,xB]
     return FNN,A
 
-def propagation(A,He,FNN,etape,taille,holes_coord):
+def propagation(A,He,FNN,etape,taille,holes_coord,alpha):
     x_min = holes_coord["x_min"]
     x_max = holes_coord["x_max"]
     y_min = holes_coord["y_min"]
@@ -58,21 +58,15 @@ def propagation(A,He,FNN,etape,taille,holes_coord):
             for y in range(y_min, y_max):
                 if He[y][x]==1:
                     PA = Patch(taille,A,y,x)
-                    voisins=[[y,x],[y-1,x],[y,x-1]]
-                    #TO DO : essayer avec les voisins de FNN[y-1,x] et FNN[y,x-1] (attention aux bords)
+
                     voisins_FNN = [FNN[y,x],FNN[y-1,x],FNN[y-1,x]+[1,0],FNN[y,x-1],FNN[y,x-1]+[0,1]]
                     #voisins_FNN = [FNN[y,x],FNN[y-1,x],FNN[y,x-1]]
                     voisins_FNN = [indices for indices in voisins_FNN if not_hole(taille,He, indices[0], indices[1]) ]
                     distances=[]
                     for voisin in voisins_FNN:
                         PB = Patch(taille,A,voisin[0],voisin[1])
-                        distances.append(PA.distance(PB))
+                        distances.append(PA.distance(PB,alpha))
                     ind_min = np.argmin(distances)
-                    #print(f"indice_min : {ind_min}")
-                    #if(voisins_FNN[ind_min][0]==(FNN[y-1,x]+[1,0])[0] and voisins_FNN[ind_min][1]==(FNN[y-1,x]+[1,0])[1]):
-                    #    print(f"Amelioration du voisin du patch du voisin pour le pixel : x={x},y={y}")
-                    #if(voisins_FNN[ind_min][0]==(FNN[y,x-1]+[0,1])[0] and voisins_FNN[ind_min][1]==(FNN[y,x-1]+[0,1])[1]):
-                    #    print(f"Amelioration du voisin du patch du voisin pour le pixel : x={x},y={y}")
                     FNN[y,x]=voisins_FNN[ind_min]
                     yB = FNN[y][x][0]
                     xB = FNN[y][x][1]
@@ -83,14 +77,14 @@ def propagation(A,He,FNN,etape,taille,holes_coord):
             for y in range(y_max,y_min,-1):
                 if He[y][x]==1:
                     PA = Patch(taille,A,y,x)
-                    voisins=[[y,x],[y+1,x],[y,x+1]]
+                    #voisins=[[y,x],[y+1,x],[y,x+1]]
                     voisins_FNN = [FNN[y,x],FNN[y+1,x],FNN[y+1,x]+[-1,0],FNN[y,x+1],FNN[y,x+1]+[0,-1]]
                     #voisins_FNN = [FNN[y,x],FNN[y+1,x],FNN[y,x+1]]
                     voisins_FNN = [indices for indices in voisins_FNN if not_hole(taille,He, indices[0], indices[1]) ]                    
                     distances=[]
                     for voisin in voisins_FNN:
                         PB = Patch(taille,A,voisin[0],voisin[1])
-                        distances.append(PA.distance(PB))
+                        distances.append(PA.distance(PB,alpha))
                     ind_min = np.argmin(distances)
                     FNN[y,x]=voisins_FNN[ind_min]
                     yB = FNN[y][x][0]
@@ -98,7 +92,7 @@ def propagation(A,He,FNN,etape,taille,holes_coord):
                     A[y,x]=A[yB,xB]
     return FNN,A
 
-def random_search(A,He,FNN,taille,scale,holes_coord):
+def random_search(A,He,FNN,taille,scale,holes_coord,alpha):
     x_min = holes_coord["x_min"]
     x_max = holes_coord["x_max"]
     y_min = holes_coord["y_min"]
@@ -119,7 +113,7 @@ def random_search(A,He,FNN,taille,scale,holes_coord):
                         ry = random.randint(-scale,scale)
                     PB = Patch(taille,A,yB,xB)
                     P_Potentiel = Patch(taille,A,yB+ry,xB+rx)
-                    if PA.distance(P_Potentiel)<PA.distance(PB):
+                    if PA.distance(P_Potentiel,alpha)<PA.distance(PB,alpha):
                         FNN[y][x][0]=yB+ry
                         FNN[y][x][1]=xB+rx
                         A[y,x]=A[yB+ry,xB+rx]
