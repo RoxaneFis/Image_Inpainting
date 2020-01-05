@@ -69,6 +69,7 @@ if __name__ == '__main__':
     #cv2.imshow(f"Visu_propagation_ini",visu)
     alphas=[1,0.7,0.5,0.3,0.1,0.01]
     for alpha in alphas:
+        FNN, A = initialisation(He,B,taille,holes_coord)
         for etape in range(nombre_etape):
             print(f"Phase de propagation: {etape} taille: {taille}")
             FNN,A = propagation(A,He,FNN,etape,taille,holes_coord, alpha)
