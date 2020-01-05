@@ -5,7 +5,7 @@ import jupyterlab
 import datetime
 from time import strftime
 from patchmatch import initialisation, propagation, random_search
-from utils import gradient, visualisation, verification
+from utils import gradient, visualisation, verification, evaluation
 from trackbar import get_hole, paint_draw, parameters
 
 
@@ -37,6 +37,7 @@ if __name__ == '__main__':
 
     #INITIAL IMAGE
     B =cv2.imread(args.image_input)
+    B_origine = B.copy()
     heightB,widthB = B.shape[:2]
     cv2.rectangle(B,(taille,taille),(widthB-taille,heightB-taille),(233))
     cv2.imshow("image_B",B)
@@ -85,6 +86,8 @@ if __name__ == '__main__':
             cv2.imshow(name,A)
             print(dir_name+name)
             cv2.imwrite(f"{dir_name}{heure}_static_{name}",A)
+    print(f"Evaluation distance image STATIC : {evaluation(B_origine,A)}")
+    FNN, A = initialisation(He,B,taille,holes_coord)
     for etape in range(nombre_etape):
 
         print(f"Phase de propagation: {etape} taille: {taille}")
@@ -103,6 +106,7 @@ if __name__ == '__main__':
             print(dir_name+name)
             cv2.imwrite(f"{dir_name}{heure}_dynamic_{name}",A)
         taille = taille-1
+    print(f"Evaluation distance image DYNAMIQUE : {evaluation(B_origine,A)}")
     cv2.waitKey()
 
 
