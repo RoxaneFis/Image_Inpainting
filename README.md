@@ -1,4 +1,3 @@
-# Image_Inpainting
 # Image Inpainting
 Algorithme d'autocomplétion d'image s'appuyant sur l'algorithme PatchMatch
 
