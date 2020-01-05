@@ -3,15 +3,11 @@ import numpy as np
 import random
 
 def gradient(img):
-
     grayImage = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
     sobelx64 = cv2.Sobel(grayImage,cv2.CV_64F,1,0,ksize=3)
     sobely64 = cv2.Sobel(grayImage,cv2.CV_64F,0,1,ksize=3)
-
     sobelx = np.uint8(np.absolute(sobelx64))
     sobely = np.uint8(np.absolute(sobely64))
-
     grad=(sobelx+sobely)//2
     return grad
 

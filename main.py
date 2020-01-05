@@ -19,7 +19,6 @@ def parse_args():
     parser.add_argument('--alpha', type=int, help='Coefficient pour le gradient', default=0.7)
     parser.add_argument('--sizebrush', type=int, help='Taille de la brosse', default=15)
     parser.add_argument('--dir_name', type=str, help='Repertoire où stocker les images', default="")
-    #parser.add_argument('--image_hole', type=str, help='file to hole in full image to fill')
     args = parser.parse_args()
     return args
 
@@ -35,7 +34,7 @@ if __name__ == '__main__':
     size_brush = args.sizebrush
     dir_name = args.dir_name
 
-    #INITIAL IMAGE
+    #IMAGE A COMPLETER
     B =cv2.imread(args.image_input)
     heightB,widthB = B.shape[:2]
     cv2.rectangle(B,(taille,taille),(widthB-taille,heightB-taille),(233))
@@ -43,11 +42,9 @@ if __name__ == '__main__':
     grad = gradient(B)
     cv2.imshow("gradient",grad)
 
-
-    #INITIALIZE HOLE
-    name = "Windows"
-    cv2.imshow(name,B)
-    param = get_hole(B,size_brush,name)
+    #INITIALISATION DU TROU
+    cv2.imshow("Windows",B)
+    param = get_hole(B,size_brush,"Windows")
     holes_coord = {"x_min":param.x_min,"x_max":param.x_max,"y_min":param.y_min,"y_max":param.y_max}
     He =param.hole
     for x in range(param.width-1):
@@ -55,40 +52,28 @@ if __name__ == '__main__':
             if He[y,x]==1:
                 B[y,x]=(0,0,0)
     cv2.imshow("B_painted",B)
-    date = datetime.datetime.now()
-    heure = date.strftime("%Y-%m-%d_%Hh%Mm%Ss")
-    name =f"{heure}_image_trouee.jpg"
-    cv2.imwrite(dir_name+name,B)
-    #INITIALISATION
-
-    print(heure)
+    cv2.imwrite(f"{dir_name}image_trouee.jpg",B)
+    
+    #INITIALISATION DE L'IMAGE
     FNN, A = initialisation(He,B,taille,holes_coord)
     cv2.imshow("image_A_ini",A)
-    name =f"{heure}_image_A_ini.jpg"
-    cv2.imwrite(dir_name+name,A)
-    #visu=visualisation(A_padding,C,FNN,taille,holes_coord)
-    #cv2.imshow(f"Visu_propagation_ini",visu)
+    cv2.imwrite(f"{dir_name}image_A_ini.jpg",A)
+    #PROPAGATION
     for etape in range(nombre_etape):
         taille = taille-1
-        # taille = tailles[etape%6]
         print(f"Phase de propagation: {etape} taille: {taille}")
+        #Propagation
         FNN,A = propagation(A,He,FNN,etape,taille,holes_coord, alpha)
-        if (etape%1==0): 
-            name = f"{heure}_A_etape_{etape}_propagation_taille_{taille}.jpg"
-            cv2.imshow(name,A)
-            cv2.imwrite(dir_name+name,A)
-            #visu=visualisation(A, FNN,taille,holes_coord, He)
-            #cv2.imshow(f"Visu_propagation_{etape}",visu)
-        
+        name = f"A_etape_{etape}_propagation_taille_{taille}.jpg"
+        cv2.imshow(name,A)
+        cv2.imwrite(dir_name+name,A)
         print(f"Random search {etape} taille: {taille}")
+        #Random search
         FNN,A = random_search(A, He,FNN,taille,scale,holes_coord,alpha)
-        if (etape%1==0): 
-            name = f"{heure}_A_etape_{etape}_random_taille_{taille}.jpg"
-            cv2.imshow(name,A)
-            print(dir_name+name)
-            cv2.imwrite(dir_name+name,A)
-            #visu=visualisation(A,FNN,taille,holes_coord, He)
-            #cv2.imshow(f"Visu_random_{etape}",visu)
+        name = f"A_etape_{etape}_random_taille_{taille}.jpg"
+        cv2.imshow(name,A)
+        print(dir_name+name)
+        cv2.imwrite(dir_name+name,A)
     cv2.waitKey()
 
 

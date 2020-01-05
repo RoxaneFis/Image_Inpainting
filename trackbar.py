@@ -28,8 +28,7 @@ def paint_draw(event,former_x,former_y,flags,param):
         mode = True
         current_former_x,current_former_y=former_x,former_y
         cv2.line(param.image_copy,(current_former_x,current_former_y),(former_x,former_y),(0,0,255),param.size_brush)
-        param.hole[former_y:former_y+param.size_brush,former_x:former_x+param.size_brush]=1
-                
+        param.hole[former_y:former_y+param.size_brush,former_x:former_x+param.size_brush]=1          
     elif event==cv2.EVENT_MOUSEMOVE:
         if drawing==True:
             if mode==True:
@@ -50,15 +49,12 @@ def paint_draw(event,former_x,former_y,flags,param):
         if mode==True:
             current_former_x = former_x
             current_former_y = former_y
-
-
     return former_x,former_y
 
 
 def get_hole(image,size_brush,name):
     param = parameters(image,size_brush)
     cv2.setMouseCallback(name,paint_draw,param)
-    
     while(1):
         cv2.imshow(name,param.image_copy)
 
@@ -69,11 +65,10 @@ def get_hole(image,size_brush,name):
         cv2.imshow('OpenCV Paint hole',gray)
         k=cv2.waitKey(10)& 0xFF
         if k == ord('r'):
-            # Press key `q` to quit the program
+            # Press key `r` to quit the program
             return param
             exit() 
     return param
-
 
 
 if __name__ == "__main__":

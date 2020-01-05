@@ -12,9 +12,7 @@ def not_hole(taille:int,He, y:int, x:int)->bool:
     if(not check_boundary(taille,y,x,height,width)or He[y,x]==1 ):
         return False
     else:
-        return True
-
-        
+        return True   
 
 def initialisation(He, B, taille: int, holes_coord):
     #B image trouee
@@ -31,7 +29,6 @@ def initialisation(He, B, taille: int, holes_coord):
             FNN[y][x][0]=y
             FNN[y][x][1]=x
     #Initilisation de A : pixel aleatoire dans les trous
-
     for x in range(x_min,x_max):
         for y in range(y_min,y_max):
             if He[y][x]==1:
@@ -53,14 +50,13 @@ def propagation(A,He,FNN,etape,taille,holes_coord,alpha):
     y_min = holes_coord["y_min"]
     y_max = holes_coord["y_max"]
     heightA,widthA = A.shape[:2]
-    if (etape%2==0): #pair
+    if (etape%2==0): 
         for x in range(x_min, x_max):
             for y in range(y_min, y_max):
                 if He[y][x]==1:
                     PA = Patch(taille,A,y,x)
 
                     voisins_FNN = [FNN[y,x],FNN[y-1,x],FNN[y-1,x]+[1,0],FNN[y,x-1],FNN[y,x-1]+[0,1]]
-                    #voisins_FNN = [FNN[y,x],FNN[y-1,x],FNN[y,x-1]]
                     voisins_FNN = [indices for indices in voisins_FNN if not_hole(taille,He, indices[0], indices[1]) ]
                     distances=[]
                     for voisin in voisins_FNN:
@@ -77,9 +73,7 @@ def propagation(A,He,FNN,etape,taille,holes_coord,alpha):
             for y in range(y_max,y_min,-1):
                 if He[y][x]==1:
                     PA = Patch(taille,A,y,x)
-                    #voisins=[[y,x],[y+1,x],[y,x+1]]
                     voisins_FNN = [FNN[y,x],FNN[y+1,x],FNN[y+1,x]+[-1,0],FNN[y,x+1],FNN[y,x+1]+[0,-1]]
-                    #voisins_FNN = [FNN[y,x],FNN[y+1,x],FNN[y,x+1]]
                     voisins_FNN = [indices for indices in voisins_FNN if not_hole(taille,He, indices[0], indices[1]) ]                    
                     distances=[]
                     for voisin in voisins_FNN:

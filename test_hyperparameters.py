@@ -16,13 +16,12 @@ def parse_args():
     """Parse input arguments."""
     parser = argparse.ArgumentParser(description='Multiple object tracker')
     parser.add_argument('--image_input', type=str, help='file to full image to fill')
-    parser.add_argument('--nombre_etapes', type=int, help='nombre d etapes', default=3)
-    parser.add_argument('--taille', type=int, help='taille du patch',default=21)
-    parser.add_argument('--scale', type=int, help='Echelle random search', default=100)
+    parser.add_argument('--nombre_etapes', type=int, help='nombre d etapes', default=9)
+    parser.add_argument('--taille', type=int, help='taille du patch',default=10)
+    parser.add_argument('--scale', type=int, help='Echelle random search', default=20)
     parser.add_argument('--alpha', type=int, help='Coefficient pour le gradient', default=0.7)
     parser.add_argument('--sizebrush', type=int, help='Taille de la brosse', default=15)
     parser.add_argument('--dir_name', type=str, help='Repertoire où stocker les images', default="")
-    #parser.add_argument('--image_hole', type=str, help='file to hole in full image to fill')
     args = parser.parse_args()
     return args
 
@@ -31,30 +30,24 @@ def test_taille_patches(taille_patches, He, B, holes_coord,alpha):
     scale=15
     nombre_etape=9
     distances = {}
-    print(f"\nTEST_TAILLE_PATCHES\nHyperparametres:\nNombre_etape={nombre_etape}\nScale={scale}\n")
-    
     #Nouveau dossier pour chaque etape
     for etape in range(nombre_etape+1):
         if (etape%3==0): 
             try:
                 os.mkdir(f"./tests_hyperparameters/taille_patches/etape_{etape}")
             except OSError as error:
-                pass
+                pass          
     for taille in taille_patches:
         FNN, A = initialisation(He,B,taille,holes_coord)
         #PROPAGATION
         for etape in range(nombre_etape+1):
             FNN,A = propagation(A,He,FNN,etape,taille,holes_coord, alpha)
-            if (etape%3==0): 
-                pass
-                cv2.imshow(f"Patch_{taille}_Propagation_nb_{etape}",A)
             FNN,A = random_search(A, He,FNN,taille,scale,holes_coord,alpha)
             if (etape%3==0): 
                 cv2.imshow(f"Patch_{taille}_Random_nb_{etape}",A)
                 cv2.imwrite( f"tests_hyperparameters/taille_patches/etape_{etape}/size_patch_{taille}.jpg", A )
             if(etape == nombre_etape):
                  distances[taille] = np.linalg.norm(B-A)
-    print("Fin : Les images ont bien été sauvegardé dans tests_hyperparameters/taille_patches ")
     return distances
 
 
@@ -62,8 +55,6 @@ def test_scales(scales, He, B,holes_coord,alpha):
     taille = 10
     nombre_etape=9
     distances = {}
-    print(f"\nTEST_SCALE\nHyperparametres:\nTaille_patch={taille}\nNombre_etape={nombre_etape}\n")
-    
     #Nouveau dossier pour chaque etape
     for etape in range(nombre_etape+1):
         if (etape%3==0): 
@@ -77,15 +68,12 @@ def test_scales(scales, He, B,holes_coord,alpha):
         #PROPAGATION
         for etape in range(nombre_etape+1):
             FNN,A = propagation(A,He,FNN,etape,taille,holes_coord, alpha)
-            if (etape%3==0): 
-                cv2.imshow(f"Scale_{scale}_Propagation_nb_{etape}",A)
             FNN,A = random_search(A, He,FNN,taille,scale,holes_coord,alpha)
             if (etape%3==0): 
                 cv2.imshow(f"Scale_{scale}_Random_nb_{etape}",A)
                 cv2.imwrite( f"tests_hyperparameters/scales/etape_{etape}/size_scale_{scale}.jpg", A )
             if(etape == nombre_etape):
                 distances[scale]=(np.linalg.norm(B-A))
-    print("Fin : Les images ont bien été sauvegardé dans tests_hyperparameters/scales ")
     return distances
 
 
@@ -93,31 +81,24 @@ def test_nombre_etapes(nombre_etapes_max,He,B,holes_coord,alpha):
     taille = 10
     scale = 20
     distances = {}
-    print(f"\nTEST_NOMBRES_ETAPES\nHyperparametres:\nTaille_patch={taille}\nScale={scale}\n")
     #INITIALISATION
     FNN, A = initialisation(He,B,taille,holes_coord)
     cv2.imshow(f"Tests_Nb_Etapes_{taille}",A)
     #PROPAGATION
     for etape in range(nombre_etapes_max+1):
-        #Propa
         FNN,A = propagation(A,He,FNN,etape,taille,holes_coord, alpha)
-        cv2.imshow(f"Propagation_nb_{etape}",A)
-        #Random_search
         FNN,A = random_search(A, He,FNN,taille,scale,holes_coord,alpha)
         cv2.imshow(f"Random_nb_{etape}",A)
         cv2.imwrite( f"tests_hyperparameters/nombre_etapes/etape_{etape}.jpg", A)
         distances[etape]=np.linalg.norm(B-A)
-    print("Fin : Les images ont bien été sauvegardé dans tests_hyperparameters/nb_etapes ")
     return distances
-
-
 
 
 
 if __name__ == '__main__':
     #HYPERPARAMETERS
-    #taille_patches = [2,4,6,8,10,12]
-    scales=[4,8,12,16,20,24,26,28]
+    taille_patches = [2,4,6,8,10,12,14,16,18]
+    scales=[4,8,16,32,64,128,256,512]
     nombre_etapes_max=30
 
     #HYPERPARAMETERS
@@ -129,7 +110,7 @@ if __name__ == '__main__':
     size_brush = args.sizebrush
     dir_name = args.dir_name
 
-    #INITIAL IMAGE
+    #IMAGE A COMPLETER
     B =cv2.imread(args.image_input)
     heightB,widthB = B.shape[:2]
     cv2.rectangle(B,(taille,taille),(widthB-taille,heightB-taille),(233))
@@ -137,8 +118,7 @@ if __name__ == '__main__':
     grad = gradient(B)
     cv2.imshow("gradient",grad)
 
-
-    #INITIALIZE HOLE
+    #INITIALISATION DU TROU
     name = "Windows"
     cv2.imshow(name,B)
     param = get_hole(B,size_brush,name)
@@ -150,16 +130,25 @@ if __name__ == '__main__':
                 B[y,x]=(0,0,0)
     date = datetime.datetime.now()
 
+    #CREATION DES DOSSIERS TESTS
+    try:
+        os.mkdir(f"./tests_hyperparameters")
+        os.mkdir(f"./tests_hyperparameters/nombre_etapes")
+        os.mkdir(f"./tests_hyperparameters/scales")
+        os.mkdir(f"./tests_hyperparameters/taille_patches")
+        os.mkdir(f"./tests_hyperparameters/taille_patches/figures")
+        os.mkdir(f"./tests_hyperparameters/nombre_etapes/figures")
+        os.mkdir(f"./tests_hyperparameters/scales/figures")
+    except OSError as error:
+                pass
+
     #TESTS
-    #distances_patches =test_taille_patches(taille_patches,He,B,holes_coord,alpha)
+    distances_patches =test_taille_patches(taille_patches,He,B,holes_coord,alpha)
     distances_scales = test_scales(scales,He,B,holes_coord,alpha)
     distances_nb_etapes = test_nombre_etapes(nombre_etapes_max,He,B,holes_coord,alpha)
-    distances = {"scales":distances_scales, "nombre_etapes":distances_nb_etapes}
-    #distances = {"taille_patches":distances_patches, "scales":distances_scales, "nombre_etapes":distances_nb_etapes}
-    #distances = {"taille_patches":distances_patches}
+    distances = {"taille_patches":distances_patches, "scales":distances_scales, "nombre_etapes":distances_nb_etapes}
     
     #PLOT
-    count=0
     for key,tab in distances.items() :
         lists = sorted(tab.items()) # sorted by key, return a list of tuples
         metric, distance_to_B = zip(*lists)
@@ -167,8 +156,7 @@ if __name__ == '__main__':
         plt.plot(metric,distance_to_B)
         plt.ylabel('Distance_A_to_B')
         plt.xlabel(f'Metric : {key} ')
-        plt.savefig(f'tests_hyperparameters/{key}/figures/test_nb_{count}.jpg')
+        plt.savefig(f'tests_hyperparameters/{key}/figures/test_{key}.jpg')
         count = count+1
     plt.show()
-
     cv2.waitKey()
