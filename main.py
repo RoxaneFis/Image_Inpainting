@@ -14,7 +14,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Multiple object tracker')
     parser.add_argument('--image_input', type=str, help='file to full image to fill')
     parser.add_argument('--nombre_etapes', type=int, help='nombre d etapes', default=3)
-    parser.add_argument('--taille', type=int, help='taille du patch',default=21)
+    parser.add_argument('--taille', type=int, help='taille du patch',default=20)
     parser.add_argument('--scale', type=int, help='Echelle random search', default=100)
     parser.add_argument('--alpha', type=int, help='Coefficient pour le gradient', default=0.7)
     parser.add_argument('--sizebrush', type=int, help='Taille de la brosse', default=15)
@@ -69,7 +69,7 @@ if __name__ == '__main__':
     #visu=visualisation(A_padding,C,FNN,taille,holes_coord)
     #cv2.imshow(f"Visu_propagation_ini",visu)
     for etape in range(nombre_etape):
-        #taille = taille-1
+        taille = taille-1
         # taille = tailles[etape%6]
         print(f"Phase de propagation: {etape} taille: {taille}")
         FNN,A = propagation(A,He,FNN,etape,taille,holes_coord, alpha)
