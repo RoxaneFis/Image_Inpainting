@@ -69,15 +69,14 @@ if __name__ == '__main__':
     #visu=visualisation(A_padding,C,FNN,taille,holes_coord)
     #cv2.imshow(f"Visu_propagation_ini",visu)
     for etape in range(nombre_etape):
-        # taille = tailles[etape%6]
+
         print(f"Phase de propagation: {etape} taille: {taille}")
         FNN,A = propagation(A,He,FNN,etape,taille,holes_coord, alpha)
         if (etape%1==0): 
             name = f"{etape}_propagation_taille_{taille}.jpg"
             cv2.imshow(name,A)
-            cv2.imwrite(f"static{dir_name}{name}",A)
-            #visu=visualisation(A, FNN,taille,holes_coord, He)
-            #cv2.imshow(f"Visu_propagation_{etape}",visu)
+            cv2.imwrite(f"{dir_name}{heure}_static_{name}",A)
+
         
         print(f"Random search {etape} taille: {taille}")
         FNN,A = random_search(A, He,FNN,taille,scale,holes_coord,alpha)
@@ -85,18 +84,16 @@ if __name__ == '__main__':
             name = f"{etape}_random_taille_{taille}.jpg"
             cv2.imshow(name,A)
             print(dir_name+name)
-            cv2.imwrite(f"static{dir_name}{name}",A)
+            cv2.imwrite(f"{dir_name}{heure}_static_{name}",A)
     for etape in range(nombre_etape):
-        
-        # taille = tailles[etape%6]
+
         print(f"Phase de propagation: {etape} taille: {taille}")
         FNN,A = propagation(A,He,FNN,etape,taille,holes_coord, alpha)
         if (etape%1==0): 
             name = f"{etape}_propagation_taille_{taille}.jpg"
             cv2.imshow(name,A)
-            cv2.imwrite(f"dynamic{dir_name}{name}",A)
-            #visu=visualisation(A, FNN,taille,holes_coord, He)
-            #cv2.imshow(f"Visu_propagation_{etape}",visu)
+            cv2.imwrite(f"{dir_name}{heure}_dynamic_{name}",A)
+
         
         print(f"Random search {etape} taille: {taille}")
         FNN,A = random_search(A, He,FNN,taille,scale,holes_coord,alpha)
@@ -104,7 +101,7 @@ if __name__ == '__main__':
             name = f"{etape}_random_taille_{taille}.jpg"
             cv2.imshow(name,A)
             print(dir_name+name)
-            cv2.imwrite(f"dynamic{dir_name}{name}",A)
+            cv2.imwrite(f"{dir_name}{heure}_dynamic_{name}",A)
         taille = taille-1
     cv2.waitKey()
 
