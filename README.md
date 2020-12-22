@@ -1,20 +1,41 @@
 # Image Inpainting
-Algorithme d'autocomplétion d'image s'appuyant sur l'algorithme PatchMatch
+Inpainting is the automatic reconstruction of missing or damaged parts of an image.
 
+ ![](results/example1.png)
 
 ## Structure
-Le projet contient les fichiers suivants :
-* main.py : lancer l'algorithme, 
-* Patch.py : classe des patchs
-* trackbar.py : interface avec l'utilisateur pour tracer les trous
-* utils.py : fonctions de visualisation, vérification, évaluation
-* test_....py : tester les améliorations implémentées et les hyperparamètres
+The project contains the following files:
+* main.py: launch the algorithm, 
+* Patch.py: class of patches
+* trackbar.py: user interface for tracing holes
+* utils.py: visualization, verification, evaluation functions
+* test.py: test the implemented improvements and hyperparameters
+
+ ![](code_structure.png)
 
 
-## Lancement du programme
-Pour lancer le programme, il faut écrire la ligne de commande suivante :
+## Launching the programme
+To start the program, write the following command line :
+ ```js
+python main.py --image_input <IMAGE.JPG> --dir_name <dir_outputs> --nombre_etapes 10 --taille 12 --sizebrush 10
+```
 
-    python main.py --image_input IMAGE.JPG --dir_name REPTERTOIRE_POUR_ENREGISTRER_LES_IMAGES --nombre_etapes 10 --taille 12 --sizebrush 10
+A window named "windows" then opens with the image, and the user can draw the holes he wants to apply to the image.
 
-Une fenêtre nommée "Windows" s'ouvre alors avec l'image, et l'utilisateur peut tracer les trous qu'il souhaite appliquer à l'image.
+ ![](results/step_ini.jpg)
+
+
+Progressive steps:
+
+Step 1         |  Step 2 
+:-------------------------:|:-------------------------: 
+ ![](results/step_0.jpg)  |   ![](results/step_1.jpg) |  
+
+Step 3         |  Step 4
+:-------------------------:|:-------------------------: 
+ ![](results/step_2.jpg)  |   ![](results/step_3.jpg) |  
+
+ Step 8        |  Step 9
+:-------------------------:|:-------------------------: 
+ ![](results/step_8.jpg)  |   ![](results/step_9.jpg) |  
 

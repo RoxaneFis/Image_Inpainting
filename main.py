@@ -38,12 +38,11 @@ if __name__ == '__main__':
     B =cv2.imread(args.image_input)
     heightB,widthB = B.shape[:2]
     cv2.rectangle(B,(taille,taille),(widthB-taille,heightB-taille),(233))
-    cv2.imshow("image_B",B)
+    cv2.imshow("Original",B)
     grad = gradient(B)
-    cv2.imshow("gradient",grad)
 
     #INITIALISATION DU TROU
-    cv2.imshow("Windows",B)
+    cv2.imshow("Hole Initialization",B)
     param = get_hole(B,size_brush,"Windows")
     holes_coord = {"x_min":param.x_min,"x_max":param.x_max,"y_min":param.y_min,"y_max":param.y_max}
     He =param.hole
@@ -51,29 +50,24 @@ if __name__ == '__main__':
         for y in range(param.height-1):
             if He[y,x]==1:
                 B[y,x]=(0,0,0)
-    cv2.imshow("B_painted",B)
-    cv2.imwrite(f"{dir_name}image_trouee.jpg",B)
+    cv2.imshow("Hole Result",B)
+    cv2.imwrite(f"{dir_name}/Hole.jpg",B)
     
     #INITIALISATION DE L'IMAGE
     FNN, A = initialisation(He,B,taille,holes_coord)
-    cv2.imshow("image_A_ini",A)
-    cv2.imwrite(f"{dir_name}image_A_ini.jpg",A)
+    cv2.imwrite(f"{dir_name}/Initialisation.jpg",A)
     #PROPAGATION
     for etape in range(nombre_etape):
         taille = taille-1
-        print(f"Phase de propagation: {etape} taille: {taille}")
         #Propagation
         FNN,A = propagation(A,He,FNN,etape,taille,holes_coord, alpha)
-        name = f"A_etape_{etape}_propagation_taille_{taille}.jpg"
-        cv2.imshow(name,A)
-        cv2.imwrite(dir_name+name,A)
-        print(f"Random search {etape} taille: {taille}")
         #Random search
         FNN,A = random_search(A, He,FNN,taille,scale,holes_coord,alpha)
-        name = f"A_etape_{etape}_random_taille_{taille}.jpg"
+        name = f"Step_{etape}.jpg"
         cv2.imshow(name,A)
         print(dir_name+name)
-        cv2.imwrite(dir_name+name,A)
+        cv2.imwrite(f"{dir_name}/name",A)
+    cv2.imshow(name,A)
     cv2.waitKey()
 
 
